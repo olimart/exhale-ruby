@@ -125,6 +125,14 @@ class SourceFilesTest < Minitest::Test
     assert_empty Exhale::SourceFiles.list(@root, files: ["app/models/deleted.rb"])
   end
 
+  def test_empty_ruby_and_erb_files_remain_listed
+    paths = ["app/models/empty.rb", "app/views/empty.html.erb"]
+    paths.each { |path| write(path, "") }
+
+    assert_equal paths.sort, Exhale::SourceFiles.list(@root, files: paths).map(&:first)
+    paths.each { |path| assert_includes Exhale::SourceFiles.list(@root).map(&:first), path }
+  end
+
   # Contract: source/S4
   def test_generated_means_a_header_comment_that_opens_with_the_marker
     skipped = {
